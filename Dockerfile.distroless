@@ -1,0 +1,12 @@
+FROM node:16-alpine as build
+WORKDIR /app
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm ci --production --silent
+
+FROM gcr.io/distroless/nodejs:16
+ENV NODE_ENV=production
+EXPOSE 3000
+WORKDIR /app
+COPY --from=build /app /app
+COPY . .
+CMD ["index.js"]
